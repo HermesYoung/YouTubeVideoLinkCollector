@@ -1,5 +1,5 @@
 using Google.Apis.YouTube.v3;
-using YoutubeVideoCollector.Models;
+using Google.Apis.YouTube.v3.Data;
 
 namespace YoutubeVideoCollector;
 
@@ -10,7 +10,7 @@ public class VideoGetter
     {
         _service = service;
     }
-    public  IEnumerable<VideoDetail>? GetVideos(string chanel)
+    public  IEnumerable<PlaylistItem> GetVideos(string chanel)
     {
         var channelRequest = _service.Channels.List("contentDetails");
         channelRequest.Id = chanel;
@@ -18,7 +18,7 @@ public class VideoGetter
         var result = channelRequest.Execute();
         var uploads = result.Items.First().ContentDetails.RelatedPlaylists.Uploads;
 
-        var videoDetails = Enumerable.Empty<VideoDetail>();
+        var videoDetails = Enumerable.Empty<PlaylistItem>();
         var next = string.Empty;
         while (next != null)
         {
@@ -27,8 +27,7 @@ public class VideoGetter
             playListRequest.MaxResults = 50;
             playListRequest.PageToken = next;
             var playlistItemListResponse = playListRequest.Execute();
-            var videos = playlistItemListResponse.Items
-                .Select(x => new VideoDetail(x.ContentDetails.VideoId, x.Snippet.Title)).ToList();
+            var videos = playlistItemListResponse.Items.ToList();
             next = playlistItemListResponse.NextPageToken;
             videoDetails = videoDetails.Concat(videos);
         }

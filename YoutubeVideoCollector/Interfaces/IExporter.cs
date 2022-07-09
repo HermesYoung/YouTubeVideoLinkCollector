@@ -1,8 +1,9 @@
-using YoutubeVideoCollector.Models;
+using Google.Apis.YouTube.v3.Data;
 
 namespace YoutubeVideoCollector.Interfaces;
 
-public interface IExporter
+public interface IExporter : IDisposable
 {
-    void Export(IEnumerable<VideoDetail>? videoDetails, string workSheetName);
+    void BuildContent(IEnumerable<PlaylistItem> videoDetails, string exportName);
+    void Export(string filename);
 }
